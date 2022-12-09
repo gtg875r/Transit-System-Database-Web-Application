@@ -16,8 +16,8 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
 class Config:
-    MYSQL_HOST = "classmysql.engr.oregonstate.edu"
-    MYSQL_USER = "cs340_fowleraa"
-    MYSQL_PASSWORD = "0748"
-    MYSQL_DB = "cs340_fowleraa"
+    MYSQL_HOST = os.environ.get("host")
+    MYSQL_USER = os.environ.get("user")
+    MYSQL_PASSWORD = os.environ.get("password")
+    MYSQL_DB = os.environ.get("db")
     MYSQL_CURSORCLASS = "DictCursor"
