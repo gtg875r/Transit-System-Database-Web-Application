@@ -1,0 +1,250 @@
+<!-- SOURCES CITED:
+   Jinja2 template formatting based on the Jinja documentation and
+   the OSU Flask starter code:
+   Jinja. (Nov. 7, 2022) "Template Designer Documentation." [Jinja2 v3.1.x documentation]
+   https://jinja.palletsprojects.com/en/3.1.x/templates/
+
+   gkochera. (Nov. 7, 2022) "Flask Starter App." [OSU CS340 Flask guide and starter code].
+   https://github.com/osu-cs340-ecampus/flask-starter-app
+
+   The formatting for a for loop to create table headers, populate data and dropdowns,
+   is adapted from the OSU Flask starter code:
+   gkochera. (Nov. 7, 2022) "Flask Starter App." [OSU CS340 Flask guide and starter code].
+   https://github.com/osu-cs340-ecampus/flask-starter-app
+
+   Use of url_for and retrieval of ids is based on examples in the Flask documentation:
+   Flask. (Nov. 7, 2022) "Templates." [Flask v2.2.x documentation]
+   https://flask.palletsprojects.com/en/2.2.x/tutorial/templates/
+
+   Flask. (Nov. 7, 2022) "url_for" in "API." [Flask v.2.2.x documentation].
+   https://flask.palletsprojects.com/en/2.2.x/api/#flask.url_for
+-->
+{% extends "index.j2" %}
+{% block subhead %}
+    Buses
+{% endblock %}
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <p><strong>Browse Buses</strong></p>
+    {% if buses %}
+    <table>
+        <thead>
+          <tr>
+            {% for key in buses[0].keys() %}
+                <th>{{ key.replace('_', ' ').replace('bus ', '').capitalize() }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for bus in buses %}
+
+          <tr>
+
+            {% for key in bus.keys() %}
+                {% if (key == 'bike_rack' or key == 'ada_lift') and bus[key] == 1 %}
+                    <td>Yes</td>
+                {% elif (key == 'bike_rack' or key == 'ada_lift') and bus[key] == 0 %}
+                    <td>No</td>
+                {% else %}
+                    <td>{{ bus[key] }}</td>
+                {% endif %}
+            {% endfor %}
+
+            <td><form action="{{ url_for('buses', bus_to_update=bus.bus_id) }}" method="post">
+            <button type="submit">Edit</button></form></td>
+
+            <td><form action="{{ url_for('delete_bus', selected_bus_id=bus.bus_id) }}">
+            <button type="submit">Delete</button></form></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    {% if error_msgs %}
+        {% for msg in error_msgs %}
+            <p> {{msg}} </p>
+        {% endfor %}
+    {% endif %}
+    {% if bus_to_update %}
+        <br><br>
+        <form
+            id="update-bus"
+            method="POST"
+            action="{{ url_for('update_bus',
+            bus_id=bus_to_update[0].bus_id) }}">
+            <fieldset>
+            <legend><b>Update Bus</b></legend>
+                <p>Bus ID: {{ bus_to_update[0].bus_id }}</p>
+                <label for="bus_number">Bus Number</label>
+                <input
+                    name="up_bus_number"
+                    type="number"
+                    minlength="1"
+                    value="{{ bus_to_update[0].bus_number }}"
+                    id="bus_number"
+                    />
+                <br><br>
+                <label for="purchase_year">Year Purchased</label>
+                <input
+                    name="up_purchase_year"
+                    type="number"
+                    min="4"
+                    value="{{ bus_to_update[0].purchase_year }}"
+                    id="purchase_year"
+                    />
+                <br><br>
+                <label for="license">License Plate Number</label>
+                <input
+                    name="up_license"
+                    type="text"
+                    {% if bus_to_update[0].license != None %}
+                        value="{{ bus_to_update[0].license }}"
+                    {% else %}
+                        placeholder="Enter license plate"
+                    {% endif %}
+                    min="1"
+                    max="10"
+                    id="license"/>
+                <br><br>
+                <label for="remove-license">Remove License Plate Number</label>
+                <input
+                    type="checkbox"
+                    name="remove-license"
+                    id="remove-license"
+                    />
+                <br><br>
+                <label for="bike_rack">Does the bus have a bike rack?</label>
+                <select name="up_bike_rack" id="bike_rack">
+                    {% if bus_to_update[0].bike_rack == 1 %}
+                        <option value="1" selected>Yes</option>
+                        <option value="0">No</option>
+                    {% else %}
+                        <option value="1">Yes</option>
+                        <option value="0" selected>No</option>
+                    {% endif %}
+                </select>
+                <br><br>
+                <label for="ada_lift">Does the bus have an ADA lift or ramp?</label>
+                <select name="up_ada_lift" id="ada_lift">
+                    {% if bus_to_update[0].ada_lift == 1 %}
+                        <option value="1" selected>Yes</option>
+                        <option value="0">No</option>
+                    {% else %}
+                        <option value="1">Yes</option>
+                        <option value="0" selected>No</option>
+                    {% endif %}
+                </select>
+                <br><br>
+                <label for="update-submit">
+                <button
+                    type="submit"
+                    id="update-submit">
+                Update Database</button></label>
+                <button
+                    type="submit"
+                    name="cancel-update"
+                    id="cancel-update">
+                    Cancel</button>
+            </fieldset>
+        </form>
+        <br><br>
+    {% endif %}
+    <br><br>
+    <form id="search-bus" method="POST" action="/buses">
+        <fieldset>
+            <legend><b>Search for a Bus</b></legend>
+            <label for="search_bus_number"></label>
+            <input
+                name="search_bus_number"
+                type="number"
+                placeholder="Enter a bus number"
+                minlength="1"
+                />
+            <br><br>
+            <label for="search_purchase_year"></label>
+            <input
+                name="search_purchase_year"
+                type="number"
+                placeholder="Enter a purchase year"
+                minlength="1"
+                />
+            <br><br>
+            <label for="search_bus_license"></label>
+            <input
+                name="search_bus_license"
+                type="text"
+                placeholder="Enter a bus license"
+                minlength="1"
+                />
+            <br><br>
+            <label for="search-submit">
+            <button
+                type="submit"
+                id="search-submit"
+                name="search-submit"
+            >Search</button>
+            </label>
+            <button
+                type="submit"
+                id="clear-search"
+                name="search-clear"
+            >Clear Search</button>
+        </fieldset>
+    </form>
+    <br><br>
+    <form id="add-new-bus" method="POST" action="/add-bus">
+        <fieldset>
+            <legend><b>Add a New Bus</b></legend>
+            <label for="bus_number">Bus Number (required)</label>
+            <input
+                name="new_bus_number"
+                type="number"
+                placeholder="2201"
+                minlength="1"
+                required="required" />
+            <br><br>
+            <label for="purchase_year">Year Purchased (required)</label>
+            <input
+                name="new_purchase_year"
+                type="number"
+                min="4"
+                placeholder="1985"
+                required="required" />
+
+            <br><br>
+            <label for="license">License Plate Number</label>
+            <input
+                name="new_license"
+                type="text"
+                placeholder="GV1234"
+                min="1"
+                max="10" />
+            <br><br>
+            <label for="no-license">No License Plate Number</label>
+            <input
+                type="checkbox"
+                name="no-license"
+                id="no-license"
+                />
+            <br><br>
+            <label for="bike_rack">Does the bus have a bike rack? (required)</label>
+            <select name="new_bike_rack" required="required">
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+            <br><br>
+            <label for="ada_lift">Does the bus have an ADA lift or ramp? (required)</label>
+            <select name="new_ada_lift" required="required">
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+            <br><br>
+            <label for="add-submit">
+            <button
+                type="submit"
+                id="add-submit"
+            >Add to the Database</button></label>
+        </fieldset>
+    </form>
+    <br><br>
+{% endblock %}

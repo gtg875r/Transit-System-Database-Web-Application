@@ -1,0 +1,243 @@
+<!-- SOURCES CITED:
+   Jinja2 template formatting based on the Jinja documentation and
+   the OSU Flask starter code:
+   Jinja. (Nov. 7, 2022) "Template Designer Documentation." [Jinja2 v3.1.x documentation]
+   https://jinja.palletsprojects.com/en/3.1.x/templates/
+
+   gkochera. (Nov. 7, 2022) "Flask Starter App." [OSU CS340 Flask guide and starter code].
+   https://github.com/osu-cs340-ecampus/flask-starter-app
+
+   The formatting for a for loop to create table headers, populate data and dropdowns,
+   is adapted from the OSU Flask starter code:
+   gkochera. (Nov. 7, 2022) "Flask Starter App." [OSU CS340 Flask guide and starter code].
+   https://github.com/osu-cs340-ecampus/flask-starter-app
+
+   Use of url_for and retrieval of ids is based on examples in the Flask documentation:
+   Flask. (Nov. 7, 2022) "Templates." [Flask v2.2.x documentation]
+   https://flask.palletsprojects.com/en/2.2.x/tutorial/templates/
+
+   Flask. (Nov. 7, 2022) "url_for" in "API." [Flask v.2.2.x documentation].
+   https://flask.palletsprojects.com/en/2.2.x/api/#flask.url_for
+-->
+{% extends "index.j2" %}
+{% block subhead %}
+    Bus Stops
+{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+    <p><strong>Browse Bus Stops</strong></p>
+    <table>
+        <thead>
+          <tr>
+            {% for key in stops[0].keys() %}
+                <th>{{ key.replace('_', ' ').replace('stop ', '').capitalize() }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for stop in stops %}
+          <tr>
+            {% for key in stop.keys() %}
+                {% if (key == 'bus_shelter' or key == 'bench' or key == 'trash') and stop[key] == 1 %}
+                    <td>Yes</td>
+                {% elif (key == 'bus_shelter' or key == 'bench' or key == 'trash') and stop[key] == 0 %}
+                    <td>No</td>
+                {% else %}
+                    <td>{{ stop[key] }}</td>
+                {% endif %}
+            {% endfor %}
+
+            <td><form action="{{ url_for('stops', stop_to_update=stop.stop_id) }}" method="post">
+                <button type="submit">Edit</button></form></td>
+            <td><form action="{{ url_for('delete_stop', selected_stop_id=stop.stop_id) }}">
+                <button type="submit">Delete</button></form></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+    {% if stop_to_update %}
+        <br><br>
+        <form
+            id="update-stop"
+            method="POST"
+            action="{{ url_for('update_stop', stop_id=stop_to_update[0].stop_id) }}">
+            <fieldset>
+            <legend><b>Update Stop</b></legend>
+                <p>Stop ID: {{ stop_to_update[0].stop_id }}</p>
+                <label for="stop_name">Bus Stop Name</label>
+                <input
+                    name="up_stop_name"
+                    type="text"
+                    minlength="1"
+                    value="{{ stop_to_update[0].stop_name }}"/>
+                <br><br>
+                <label for="shelter">Does the stop have a shelter?</label>
+                <select name="up_shelter" id="shelter">
+                    {% if stop_to_update[0].bus_shelter == 1 %}
+                        <option value="1" selected>Yes</option>
+                        <option value="0">No</option>
+                    {% else %}
+                        <option value="1">Yes</option>
+                        <option value="0" selected>No</option>
+                    {% endif %}
+                </select>
+                <br><br>
+                <label for="shelter">Does the stop have a bench?</label>
+                <select name="up_bench" id="bench">
+                    {% if stop_to_update[0].bench == 1 %}
+                        <option value="1" selected>Yes</option>
+                        <option value="0">No</option>
+                    {% else %}
+                        <option value="1">Yes</option>
+                        <option value="0" selected>No</option>
+                    {% endif %}
+                </select>
+                <br><br>
+                <label for="shelter">Does the stop have a trash can?</label>
+                <select name="up_trash" id="trash">
+                    {% if stop_to_update[0].trash == 1 %}
+                        <option value="1" selected>Yes</option>
+                        <option value="0">No</option>
+                    {% else %}
+                        <option value="1">Yes</option>
+                        <option value="0" selected>No</option>
+                    {% endif %}
+                </select>
+                <br><br>
+                <input
+                    name="up_stop_latitude"
+                    type="number"
+                    min="-90"
+                    max="90"
+                    step="0.00001"
+                    value="{{ stop_to_update[0].stop_latitude }}"/>
+                <br><br>
+                <input
+                    name="up_stop_longitude"
+                    type="number"
+                    min="-180"
+                    max="180"
+                    step="0.00001"
+                    value="{{ stop_to_update[0].stop_longitude }}"/>
+                <br><br>
+                <label for="update-submit">
+                <button
+                    type="submit"
+                    id="update-submit">
+                Update Database</button></label>
+                <button
+                    type="submit"
+                    name="cancel-update"
+                    id="cancel-update">
+                    Cancel</button>
+            </fieldset>
+        </form>
+        <br><br>
+    {% endif %}
+    <br><br>
+    <form id="search-stop" method="POST" action="/stops">
+        <fieldset>
+            <legend><b>Search for a Bus Stop</b></legend>
+            <label for="search_stop_name">Stop Name</label>
+            <input
+                name="search_stop_name"
+                type="text"
+                placeholder="Enter a stop name"
+                minlength="1"
+                />
+            <br><br>
+            <label for="search_latitude">Latitude</label>
+            <input
+                name="search_latitude"
+                type="number"
+                placeholder="33.77852"
+                min="-90"
+                max="90"
+                step="0.00001"
+                />
+            <br><br>
+            <label for="search_longitude">Longitude</label>
+            <input
+                name="search_longitude"
+                placeholder="-84.40099"
+                type="number"
+                min="-180"
+                max="180"
+                step="0.00001"
+                />
+            <br><br>
+            <label for="search-submit">
+            <button
+                type="submit"
+                id="search-submit"
+                name="search-submit"
+            >Search</button></label>
+            <button
+                type="submit"
+                id="clear-search"
+                name="search-clear"
+            >Clear Search</button>
+        </fieldset>
+    </form>
+    <br><br>
+    <form id="add-new-stop" method="POST" action="/add-stop">
+        <fieldset>
+            <legend><b>Add a New Bus Stop</b></legend>
+            <p>Note: All fields required</p>
+            <label for="stop_name">Bus Stop Name</label>
+            <input
+                name="new_stop_name"
+                type="text"
+                placeholder="Second & Main St"
+                minlength="1"
+                id="stop_name"
+                required="required" />
+            <br><br>
+            <label for="shelter">Does the stop have a shelter?</label>
+            <select name="new_shelter" required="required">
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+            <br><br>
+            <label for="bench">Does the stop have a bench?</label>
+            <select name="new_bench" required="required">
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+            <br><br>
+            <label for="trash">Does the stop have a trash can?</label>
+            <select name="new_trash" required="required">
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+            <br><br>
+            <label for="stop_latitude">What is the latitude of the bus stop?</label>
+            <input
+                name="new_stop_latitude"
+                type="number"
+                min="-90"
+                max="90"
+                step="0.00001"
+                placeholder="33.77852"
+                required="required" />
+            <br><br>
+            <label for="stop_longitude">What is the longitude of the bust stop?</label>
+            <input
+                name="new_stop_longitude"
+                type="number"
+                placeholder="-84.40099"
+                min="-180"
+                max="180"
+                step="0.00001"
+                required="required" />
+            <br><br>
+            <label for="add-submit">
+            <button
+                type="submit"
+                id="add-submit"
+            >Add to the Database</button></label>
+        </fieldset>
+    </form>
+    <br><br>
+{% endblock %}

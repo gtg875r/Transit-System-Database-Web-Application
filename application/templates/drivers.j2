@@ -1,0 +1,195 @@
+<!-- SOURCES CITED:
+   Jinja2 template formatting based on the Jinja documentation and
+   the OSU Flask starter code:
+   Jinja. (Nov. 7, 2022) "Template Designer Documentation." [Jinja2 v3.1.x documentation]
+   https://jinja.palletsprojects.com/en/3.1.x/templates/
+
+   gkochera. (Nov. 7, 2022) "Flask Starter App." [OSU CS340 Flask guide and starter code].
+   https://github.com/osu-cs340-ecampus/flask-starter-app
+
+   The formatting for a for loop to create table headers, populate data and dropdowns,
+   is adapted from the OSU Flask starter code:
+   gkochera. (Nov. 7, 2022) "Flask Starter App." [OSU CS340 Flask guide and starter code].
+   https://github.com/osu-cs340-ecampus/flask-starter-app
+
+   Use of url_for and retrieval of ids is based on examples in the Flask documentation:
+   Flask. (Nov. 7, 2022) "Templates." [Flask v2.2.x documentation]
+   https://flask.palletsprojects.com/en/2.2.x/tutorial/templates/
+
+   Flask. (Nov. 7, 2022) "url_for" in "API." [Flask v.2.2.x documentation].
+   https://flask.palletsprojects.com/en/2.2.x/api/#flask.url_for
+-->
+{% extends "index.j2" %}
+{% block subhead %}
+    Drivers
+{% endblock %}
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <p><strong>Browse Drivers</strong></p>
+        <table>
+        <thead>
+          <tr>
+            {% for key in drivers[0].keys() %}
+                <th>{{ key.replace('_', ' ').replace('driver ', '').capitalize() }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for driver in drivers %}
+          <tr>
+            {% for key in driver.keys() %}
+                <td>{{ driver[key] }}</td>
+            {% endfor %}
+            <td><form action="{{ url_for('drivers', driver_to_update=driver.driver_id) }}" method="post">
+                <button type="submit">Edit</button></form></td>
+            <td><form action="{{ url_for('delete_driver', selected_driver_id=driver.driver_id) }}">
+                <button type="submit">Delete</button></form>
+          </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+    {% if driver_to_update %}
+        <br><br>
+        <form
+            id="update-driver"
+            method="POST"
+            action="{{ url_for('update_driver',
+            driver_id=driver_to_update[0].driver_id) }}">
+            <fieldset>
+            <legend><b>Update Driver</b></legend>
+                <p>Driver ID: {{ driver_to_update[0].driver_id }}</p>
+                <label for="first_name">First Name</label>
+                <input
+                    name="up_first_name"
+                    type="text"
+                    minlength="1"
+                    value="{{ driver_to_update[0].first_name }}"
+                    required />
+                <br><br>
+                <label for="last_name">Last Name</label>
+                <input
+                    name="up_last_name"
+                    type="text"
+                    min="1"
+                    value="{{ driver_to_update[0].last_name }}"
+                    required />
+                <br><br>
+                <label for="phone_number">Phone Number</label>
+                <input
+                    name="up_phone"
+                    type="text"
+                    value="{{ driver_to_update[0].phone_number }}"
+                    min="12"
+                    max="12"
+                    required />
+                <br><br>
+                <label for="start_date">Start Date</label>
+                <input
+                    name="up_start_date"
+                    type="date"
+                    value="{{ driver_to_update[0].start_date }}"
+                    required
+                    />
+                <br><br>
+                <label for="update-submit">
+                <button
+                    type="submit"
+                    id="update-submit">
+                Update Database</button></label>
+                <button
+                    type="submit"
+                    name="cancel-update"
+                    id="cancel-update">
+                    Cancel</button>
+            </fieldset>
+        </form>
+        <br><br>
+    {% endif %}
+    <br><br>
+        <form id="search-driver" method="POST" action="/drivers">
+        <fieldset>
+            <legend><b>Search for a Driver</b></legend>
+            <label for="search_driver_first"></label>
+            <input
+                name="search_driver_first"
+                type="text"
+                placeholder="Enter a first name"
+                minlength="1"
+                />
+            <br><br>
+            <label for="search_driver_last"></label>
+            <input
+                name="search_driver_last"
+                type="text"
+                placeholder="Enter a last name"
+                minlength="1"
+                />
+            <br><br>
+            <label for="search_driver_phone"></label>
+            <input
+                name="search_driver_phone"
+                type="text"
+                placeholder="Phone: 555-555-1234"
+                minlength="12"
+                />
+            <br><br>
+
+            <label for="search-submit">
+            <button
+                type="submit"
+                id="search-submit"
+                name="search-submit"
+            >Search</button></label>
+            <button
+                type="submit"
+                id="clear-search"
+                name="search-clear"
+            >Clear Search</button>
+        </fieldset>
+    </form>
+    <br><br>
+<form id="add-new-driver" method="POST" action="/add-driver">
+        <fieldset>
+            <legend><b>Add a New Driver</b></legend>
+            <label for="first_name">First Name</label>
+            <input
+                name="new_first_name"
+                type="text"
+                placeholder="Trish"
+                minlength="1"
+                required />
+            <br><br>
+            <label for="last_name">Last Name</label>
+            <input
+                name="new_last_name"
+                type="text"
+                min="1"
+                placeholder="McClendon"
+                required />
+
+            <br><br>
+            <label for="phone_number">Phone Number</label>
+            <input
+                name="new_phone_number"
+                type="text"
+                placeholder="123-555-9876"
+                min="12"
+                max="12"
+                required />
+            <br><br>
+            <label for="start_date">Start Date</label>
+            <input
+                name="new_start_date"
+                type="date"
+                placeholder="1965-01-01"
+                required/>
+            <br><br>
+            <label for="add-submit">
+            <button
+                type="submit"
+                id="add-submit"
+            >Add to the Database</button></label>
+        </fieldset>
+    </form>
+    <br><br>
+{% endblock %}

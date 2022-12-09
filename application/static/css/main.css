@@ -1,0 +1,76 @@
+body
+        {
+            background-color: #F2DFCE;
+            color: #030000;
+            font-family:Verdana;
+            font-size:16px;
+            padding-left: 80px;
+            padding-right: 50px;
+            padding-top: 30px;
+            width: 60%;
+
+        }
+
+        a:visited
+        {
+            color: #0D7680;
+        }
+
+        img
+        {
+            border: 1px solid #0D7680;
+        }
+
+        table, th, td
+        {
+            border: 1px solid #0D7680;
+            border-collapse: collapse;
+            padding: 3px;
+            font-family:Verdana;
+            font-size:12px;
+            text-align: left;
+            border-radius: 2px;
+
+        }
+        th, td
+        {
+            padding-left: 1em;
+            padding-right: 1em;
+        }
+        input
+        {
+            background-color: #FFF9F5;
+            border: 1.5px solid #0D7680;
+            border-radius: 2px;
+            padding: 4px 16px;
+        }
+
+        input:focus
+        {
+            background-color: linen;
+            border-radius: 2px;
+            padding: 4px 16px;
+            outline: 2.5px #0D7680;
+        }
+
+
+        select
+        {
+            padding: 4px 16px;
+            border-radius: 2px;
+            border: 1.5px solid #0D7680;
+            background-color: #FFF9F5;
+        }
+
+        button
+        {
+            background-color: #0D7680;
+            color: #FFF9F5;
+            border: 2px solid #0D6990;
+            border-radius: 5px;
+        }
+        button:hover
+        {
+            box-shadow: 0 8px 16px 0 rgba(2,2,1,0.3), 0 6px 20px 0 rgba(0,0,0,0.19)
+
+        }

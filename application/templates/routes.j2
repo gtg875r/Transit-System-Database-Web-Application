@@ -1,0 +1,157 @@
+<!-- SOURCES CITED:
+   Jinja2 template formatting based on the Jinja documentation and
+   the OSU Flask starter code:
+   Jinja. (Nov. 7, 2022) "Template Designer Documentation." [Jinja2 v3.1.x documentation]
+   https://jinja.palletsprojects.com/en/3.1.x/templates/
+
+   gkochera. (Nov. 7, 2022) "Flask Starter App." [OSU CS340 Flask guide and starter code].
+   https://github.com/osu-cs340-ecampus/flask-starter-app
+
+   The formatting for a for loop to create table headers, populate data and dropdowns,
+   is adapted from the OSU Flask starter code:
+   gkochera. (Nov. 7, 2022) "Flask Starter App." [OSU CS340 Flask guide and starter code].
+   https://github.com/osu-cs340-ecampus/flask-starter-app
+
+   Use of url_for and retrieval of ids is based on examples in the Flask documentation:
+   Flask. (Nov. 7, 2022) "Templates." [Flask v2.2.x documentation]
+   https://flask.palletsprojects.com/en/2.2.x/tutorial/templates/
+
+   Flask. (Nov. 7, 2022) "url_for" in "API." [Flask v.2.2.x documentation].
+   https://flask.palletsprojects.com/en/2.2.x/api/#flask.url_for
+-->
+{% extends "index.j2" %}
+{% block subhead %}
+    Transit Routes
+{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+    <p><strong>Browse Transit Routes</strong></p>
+        <table>
+        <thead>
+          <tr>
+            {% for key in routes[0].keys() %}
+                <th>{{ key.replace('_', ' ').replace('route ', '').capitalize() }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for route in routes %}
+          <tr>
+            {% for key in route.keys() %}
+                <td>{{ route[key] }}</td>
+            {% endfor %}
+
+            <td><form action="{{ url_for('routes', route_to_update=route.route_id) }}" method="post">
+                <button type="submit">Edit</button></form></td>
+            <td><form action="{{ url_for('delete_route', selected_route_id=route.route_id) }}">
+                <button type="submit">Delete</button></form></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+    {% if route_to_update %}
+        <br><br>
+        <form
+            id="update-route"
+            method="POST"
+            action="{{ url_for('update_route',
+            route_id=route_to_update[0].route_id) }}">
+            <fieldset>
+            <legend><b>Update Route</b></legend>
+                <p>Route ID: {{ route_to_update[0].route_id }}</p>
+                <label for="route_name">Route Name</label>
+                <input
+                    name="up_route_name"
+                    type="text"
+                    minlength="1"
+                    value="{{ route_to_update[0].route_name }}"
+                    required/>
+                <br><br>
+                <label for="color_name">Color Name</label>
+                <input
+                    name="up_color"
+                    type="text"
+                    min="1"
+                    value="{{ route_to_update[0].route_color }}"
+                    required/>
+                <br><br>
+
+                <label for="update-submit">
+                <button
+                    type="submit"
+                    id="update-submit">
+                Update Database</button></label>
+                <button
+                    type="submit"
+                    id="cancel-update">
+                    Cancel</button>
+            </fieldset>
+        </form>
+        <br><br>
+    {% endif %}
+    <br><br>
+        <form id="search-route" method="POST" action="/routes">
+        <fieldset>
+            <legend><b>Search for a Route</b></legend>
+            <label for="search_route_name"></label>
+            <input
+                name="search_route_name"
+                type="text"
+                placeholder="Enter a Route Name"
+                minlength="1"
+                />
+            <br><br>
+            <label for="search_route_color"></label>
+            <input
+                name="search_route_color"
+                type="text"
+                placeholder="Enter a Route color"
+                minlength="1"
+                />
+            <br><br>
+
+            <label for="search-submit">
+            <button
+                type="submit"
+                id="search-submit"
+                name="search-submit"
+            >Search</button></label>
+            <button
+                type="submit"
+                id="clear-search"
+                name="search-clear"
+            >Clear Search</button>
+        </fieldset>
+    </form>
+    <br><br>
+<form id="add-new-route" method="POST" action="/add-route">
+        <fieldset>
+            <legend><b>Add a New Route</b></legend>
+            <label for="route_name">Route Name</label>
+            <input
+                name="new_route_name"
+                type="text"
+                placeholder="Express Line"
+                minlength="1"
+                required/>
+            <br><br>
+            <label for="route_color">Color Name</label>
+            <input
+                name="new_route_color"
+                type="text"
+                min="1"
+                placeholder="Blue"
+                required/>
+
+            <br><br>
+
+            <label for="add-submit">
+            <button
+                type="submit"
+                id="add-submit"
+            >Add to the Database</button></label>
+        </fieldset>
+    </form>
+    <br><br>
+{% endblock %}

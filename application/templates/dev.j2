@@ -1,0 +1,22 @@
+<!-- SOURCES CITED:
+   Jinja2 template formatting based on the Jinja documentation and
+   the OSU Flask starter code:
+   Jinja. (Nov. 7, 2022) "Template Designer Documentation." [Jinja2 v3.1.x documentation]
+   https://jinja.palletsprojects.com/en/3.1.x/templates/
+
+   gkochera. (Nov. 7, 2022) "Flask Starter App." [OSU CS340 Flask guide and starter code].
+   https://github.com/osu-cs340-ecampus/flask-starter-app
+-->
+{% extends "index.j2" %}
+{% block subhead %}
+    Project Overview
+{% endblock %}
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <br><br>
+    <p></p>
+    <h3>ERD</h3>
+    <img src="./static/img/CS340_Group62_ERD.jpg">
+    <h3>Schema</h3>
+    <img src="./static/img/group62_db_schema.png">
+{% endblock %}

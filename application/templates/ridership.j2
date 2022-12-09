@@ -1,0 +1,250 @@
+{% extends "index.j2" %}
+{% block subhead %}
+    Passenger Ridership Logs
+{% endblock %}
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+    <p><strong>Browse Passenger Ridership Logs</strong></p>
+<table>
+        <thead>
+          <tr>
+            {# The for loop is based on the example from
+               gkochera. (Nov. 7, 2022) "Flask Starter App."
+               [OSU CS340 Flask guide and starter code].
+               https://github.com/osu-cs340-ecampus/flask-starter-app #}
+
+            {% for key in logs[0].keys() %}
+                <th>{{ key }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in logs %}
+          <tr>
+            {% for key in log.keys() %}
+                <td>{{ log[key] }}</td>
+            {% endfor %}
+                <td><form action="{{ url_for('ridership', log_to_update=log.log_id) }}" method="post">
+                <button type="submit">Edit</button></form></td>
+{#            <td><a href="{{ url_for('ridership', log_to_update=log.log_id) }}">Edit</a></td>#}
+
+            {# Use of url_for and retrieval of bus_id is based on examples
+               from:
+               Flask. (Nov. 7, 2022) "Templates." [Flask v2.2.x documentation]
+               https://flask.palletsprojects.com/en/2.2.x/tutorial/templates/
+
+               Flask. (Nov. 7, 2022) "url_for" in "API." [Flask v.2.2.x documentation].
+               https://flask.palletsprojects.com/en/2.2.x/api/#flask.url_for #}
+
+                <td><form action="{{ url_for('delete_log', selected_log_id=log.log_id) }}">
+                <button type="submit">Delete</button></form></td>
+
+{#            <td><a href="{{ url_for('delete_log', selected_log_id=log.log_id) }}">Delete</a></td>#}
+          </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+    <br></br>
+    {% if log_to_update %}
+        <form
+            id="update-log"
+            method="POST"
+            action="{{ url_for('update_log',
+            log_id=log_to_update[0].log_id) }}">
+            <fieldset>
+            <legend><b>Update Passenger Ridership Log</b></legend>
+                <p>Log ID: {{ log_to_update[0].log_id }}</p>
+                <label for="passenger_entry">Did a passenger board?</label>
+                <select name="up_passenger_entry" id="passenger_entry">
+                    {% if log_to_update[0].passenger_entry == 1 %}
+                        <option value="1" selected>Yes</option>
+                        <option value="0">No</option>
+                    {% else %}
+                        <option value="1">Yes</option>
+                        <option value="0" selected>No</option>
+                    {% endif %}
+                </select>
+                <br><br>
+                <label for="passenger_exit">Did a passenger exit?</label>
+                <select name="up_passenger_exit" id="passenger_exit">
+                    {% if log_to_update[0].passenger_exit == 1 %}
+                        <option value="1" selected>Yes</option>
+                        <option value="0">No</option>
+                    {% else %}
+                        <option value="1">Yes</option>
+                        <option value="0" selected>No</option>
+                    {% endif %}
+                </select>
+                <br><br>
+                <label for="driver">What is the driver's name?</label>
+                <select name="up_driver" id="driver">
+                    <option value="">None</option>
+                    {% for driver in drivers %}
+                        {% if driver.driver_id == log_to_update[0].driver_id %}
+                        <option value="{{ driver.driver_id }}" selected>
+                            {{driver.first_name}} {{driver.last_name}}
+                        </option>
+                        {% else %}
+                        <option value="{{ driver.driver_id }}">
+                            {{driver.first_name}} {{driver.last_name}}
+                        </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <br><br>
+                <label for="route">What is the current route and stop?</label>
+                <select name="up_route" id="route">
+                    <option value="">None</option>
+                    {% for route_stop in route_stops %}
+                        {% if route_stop.route_stops_id == log_to_update[0].route_stops_id %}
+                        <option value="{{ route_stop.route_stops_id }}" selected>
+                            {{ route_stop.route_name }} {{ route_stop.stop_name }}
+                        </option>
+                        {% else %}
+                        <option value="{{ route_stop.route_stops_id }}">
+                            {{ route_stop.route_name }} | {{ route_stop.stop_name }}
+                        </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <br><br>
+                <label for="bus">What is the bus number?</label>
+                <select name="up_bus" id="bus">
+                    <option value="">None</option>
+                    {% for bus in buses %}
+                        {% if bus.bus_id == log_to_update[0].bus_id %}
+                        <option value="{{ bus.bus_id }}" selected>
+                            {{ bus.bus_number }}
+                        </option>
+                        {% else %}
+                        <option value="{{ bus.bus_id }}">
+                            {{ bus.bus_number }}
+                        </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <br><br>
+                <label for="log_datetime">What is the date and time of the passenger entry/exit?</label>
+                <input
+                    name="up_log_datetime"
+                    id="log_datetime"
+                    value="{{ log_to_update[0].log_datetime }}"
+                    minlength="19"
+                    type="datetime-local"
+                    step="1"
+                    />
+                <br><br>
+                <label for="update-submit">
+                <button
+                    type="submit"
+                    id="update-submit">
+                Update Database</button></label>
+                <button
+                    type="submit"
+                    id="cancel-update">
+                    Cancel</button>
+            </fieldset>
+        </form>
+        <br><br>
+    {% endif %}
+    <form id="search-log" method="POST" action="/ridership">
+        <fieldset>
+            <legend><b>Search for a Passenger Ridership Log</b></legend>
+            <label for="start_range_date">From</label>
+            <input
+                name="start_range_date"
+                type="date"
+                id="start_range_date"
+            />
+            <label for="end_range_date">to</label>
+            <input
+                name="end_range_date"
+                id="end_range_date"
+                type="date"
+            />
+            <br><br>
+            <label for="search-submit">
+            <button
+                type="submit"
+                id="search-submit"
+            >Search</button></label>
+            <button
+                type="submit"
+                id="clear-search"
+                name="search-clear"
+            >Clear Search</button>
+        </fieldset>
+    </form>
+    <br><br>
+    <form
+        id="add-log"
+        method="POST"
+        action="/add-log"
+    >
+        <fieldset>
+            <legend><b>Add New Passenger Ridership Log</b></legend>
+                <label for="passenger_entry">Did a passenger board? (required)</label>
+                <select name="new_passenger_entry" id="passenger_entry" required="required">
+                        <option value="1" selected>Yes</option>
+                        <option value="0">No</option>
+                </select>
+                <br><br>
+                <label for="passenger_exit">Did a passenger exit? (required)</label>
+                <select name="new_passenger_exit" id="passenger_exit" required="required">
+                        <option value="1" selected>Yes</option>
+                        <option value="0">No</option>
+                </select>
+                <br><br>
+                <label for="driver">What is the driver's name?</label>
+                <select name="new_driver" id="driver">
+                    <option>Select a driver</option>
+                    {% for driver in drivers %}
+                        <option value="{{ driver.driver_id }}">
+                            {{driver.first_name}} {{driver.last_name}}
+                        </option>
+                    {% endfor %}
+                </select>
+                <br><br>
+                <label for="route">What is the current route and stop?</label>
+                <select name="new_route" id="route">
+                    <option>Select a route and stop</option>
+                    {% for route_stop in route_stops %}
+                        <option value="{{ route_stop.route_stops_id }}">
+                            {{ route_stop.route_name }} | {{ route_stop.stop_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <br><br>
+                <label for="bus">What is the bus number?</label>
+                <select name="new_bus" id="bus">
+                    <option>Select a bus</option>
+                    {% for bus in buses %}
+                        <option value="{{ bus.bus_id }}">
+                            {{ bus.bus_number }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <br><br>
+                <label for="new_log_datetime">What is the date and time of the passenger entry/exit? (required)</label>
+                <!-- CITATION: Use of datetime-local and formatting for datetime picker is adapted from:
+                MDN. (Nov. 15, 2022). "Datetime-local." https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/datetime-local -->
+                <input
+                    name="new_log_datetime"
+                    id="new_log_datetime"
+                    type="datetime-local"
+                    placeholder="2022-07-01T13:05:00"
+                    step="1"
+                    minlength="19"
+                    required="required"
+                />
+                <br><br>
+                <label for="add-log-submit">
+                <button
+                    type="submit"
+                    id="add-log-submit"
+                >Add to the Database</button>
+                </label>
+            </fieldset>
+    </form>
+{% endblock %}

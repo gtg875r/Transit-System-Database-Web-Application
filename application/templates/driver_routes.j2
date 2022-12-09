@@ -1,0 +1,126 @@
+<!-- SOURCES CITED:
+   Jinja2 template formatting based on the Jinja documentation and
+   the OSU Flask starter code:
+   Jinja. (Nov. 7, 2022) "Template Designer Documentation." [Jinja2 v3.1.x documentation]
+   https://jinja.palletsprojects.com/en/3.1.x/templates/
+
+   gkochera. (Nov. 7, 2022) "Flask Starter App." [OSU CS340 Flask guide and starter code].
+   https://github.com/osu-cs340-ecampus/flask-starter-app
+
+   The formatting for a for loop to create table headers, populate data and dropdowns,
+   is adapted from the OSU Flask starter code:
+   gkochera. (Nov. 7, 2022) "Flask Starter App." [OSU CS340 Flask guide and starter code].
+   https://github.com/osu-cs340-ecampus/flask-starter-app
+
+   Use of url_for and retrieval of ids is based on examples in the Flask documentation:
+   Flask. (Nov. 7, 2022) "Templates." [Flask v2.2.x documentation]
+   https://flask.palletsprojects.com/en/2.2.x/tutorial/templates/
+
+   Flask. (Nov. 7, 2022) "url_for" in "API." [Flask v.2.2.x documentation].
+   https://flask.palletsprojects.com/en/2.2.x/api/#flask.url_for
+-->
+{% extends "index.j2" %}
+{% block subhead %}
+    Driver Routes
+{% endblock %}
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+    <p><strong>Browse Driver Routes</strong></p>
+    <table>
+        <thead>
+          <tr>
+            {% for key in driver_routes[0].keys() %}
+                <th>{{ key.replace('_', ' ').replace('driver routes ', '').capitalize() }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for driver_route in driver_routes %}
+          <tr>
+            {% for key in driver_route.keys() %}
+                <td>{{ driver_route[key] }}</td>
+            {% endfor %}
+            <td><form action="{{ url_for('delete_driver_route', selected_driver_route_id=driver_route.driver_routes_id) }}">
+                <button type="submit">Delete</button></form></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+    <br><br>
+        <form id="search-driver_routes" method="POST" action="/driver-routes">
+        <fieldset>
+            <legend><b>Search for a Driver or Route</b></legend>
+            <label for="search_driver_first"></label>
+            <input
+                name="search_driver_first"
+                type="text"
+                placeholder="Enter a driver's first name"
+                minlength="1"
+                />
+            <br><br>
+            <label for="search_driver_last"></label>
+            <input
+                name="search_driver_last"
+                type="text"
+                placeholder="Enter a driver's last name"
+                minlength="1"
+                />
+            <br><br>
+            <label for="search_route_name"></label>
+            <input
+                name="search_route_name"
+                type="text"
+                placeholder="Enter route name"
+                minlength="1"
+                />
+            <br><br>
+            <label for="search-submit">
+            <button
+                type="submit"
+                id="search-submit"
+                name="search-submit"
+            >Search</button></label>
+            <button
+                type="submit"
+                id="clear-search"
+                name="search-clear"
+            >Clear Search</button>
+        </fieldset>
+    </form>
+    <br><br>
+    <form
+        id="add-new-driver-route"
+        method="POST"
+        action="/add-driver-route"
+    >
+        <fieldset>
+            <legend><b>Add a Driver to a Route</b></legend>
+            <label for="driver_name">Driver Name</label>
+            <select name="new_driver_id" id="driver_name">
+                <option>Select a bus driver</option>
+                {% for driver in all_drivers %}
+                    <option value="{{ driver.driver_id }}">
+                        {{ driver.first_name + " " + driver.last_name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <br><br>
+            <label for="route_name">Route Name</label>
+            <select name="new_route_id" id="route_name">
+                <option>Select a route</option>
+                {% for route in all_routes %}
+                    <option value="{{ route.route_id }}">
+                        {{ route.route_name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <br><br>
+            <label for="submit">
+            <button
+                type="submit"
+                id="submit"
+            >Add to the Database</button></label>
+        </fieldset>
+    </form>
+{% endblock %}

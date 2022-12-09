@@ -1,0 +1,88 @@
+<!-- SOURCES CITED:
+
+The structure for this template is based on the Jinja Template Designer
+Documentation and the OSU CS340 Flask Starter Guide:
+Jinja. (Oct. 24, 2022) "Template Designer Documentation" [Jinja 3.0 documentation].
+https://jinja.palletsprojects.com/en/3.0.x/templates/
+
+gkochera. (Oct. 24, 2022) "Flask Starter App" [Tutorial and starter code].
+https://github.com/osu-cs340-ecampus/flask-starter-app
+
+Retrieving the error message from Flask and using in JavaScript script at the bottom
+of this file based on the example provided by the Flask documentation (used in the script
+at the bottom of this file):
+Flask. (Nov. 30, 2022) "Rendering Templates" in "JavaScript, fetch, and JSON."
+[Flask v. 2.2.x documentation]. https://flask.palletsprojects.com/en/2.2.x/patterns/javascript/
+-->
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+
+<title>Metro Transit System</title>
+<head>
+    {% block head %}
+
+        <h1>Metro Transit System</h1>
+        <nav>
+
+            <a href="/">Home</a> |
+            <a href="/dev">Overview</a> |
+            <a href="/buses">Buses</a> |
+            <a href="/drivers">Drivers</a> |
+            <a href="/stops">Bus Stops</a> |
+            <a href="/routes">Transit Routes</a> |
+            <a href="/route-stops">Route Stops</a> |
+            <a href="/driver-routes">Driver Routes</a> |
+            <a href="/ridership">Passenger Ridership Logs</a>
+
+        </nav>
+    {% endblock %}
+<br><br>
+</head>
+<body>
+    <h2>
+    {% block subhead %}
+        Every Passenger Counts
+    {% endblock %}
+    </h2>
+    <div>
+    {% block content %}
+        <p>Smallville Transit has six bus routes serving metropolitan Smallville, with approximately two million riders per year.  This web-based database assists the agency in keeping better details on each of their ~60 bus stops, 6 routes, 40+ drivers, and 24 vehicles.</p>
+    {% endblock %}
+    </div>
+    {% if error %}
+        {# CITATION: Retrieving the error from Flask and using in JavaScript
+           based on the example provided by the Flask documentation:
+           Flask. (Nov. 30, 2022). "Rendering Templates" in "JavaScript, fetch, and JSON."
+           [Flask v. 2.2.x documentation].
+           https://flask.palletsprojects.com/en/2.2.x/patterns/javascript/ #}
+        <script>
+            let alertErrorMsg = {{ error|tojson }};
+            window.onload = () => {
+                if (alertErrorMsg) {
+                    alert(alertErrorMsg);
+                }
+            };
+        </script>
+    {% endif %}
+    <br><br>
+
+    <div id="footer">
+    {% block footer %}
+        &copy; 2022 Aaron Fowler and Julia Loy | Group 62 | SQL: The Final Revenge
+    {% endblock %}
+    </div>
+    {% if error %}
+        <script>
+            let alertErrorMsg = {{ error|tojson }};
+            window.onload = () => {
+                if (alertErrorMsg) {
+                    alert(alertErrorMsg);
+                }
+            };
+        </script>
+    {% endif %}
+    <br><br>
+</body>
+</html>
